@@ -1,10 +1,3 @@
-"""
-AI Document Analyzer — Main Streamlit Application
-===================================================
-Entry point for the web interface.
-Orchestrates document upload, analysis pipeline, Q&A chat, and report export.
-"""
-
 import hashlib
 import os
 import time
@@ -51,9 +44,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ──────────────────────────────────────────────
+
 # Session state helpers
-# ──────────────────────────────────────────────
 def _init_session():
     """Initialise default session-state keys once per session."""
     defaults = {
@@ -68,9 +60,7 @@ def _init_session():
         st.session_state.setdefault(k, v)
 
 
-# ──────────────────────────────────────────────
 # Sidebar
-# ──────────────────────────────────────────────
 def render_sidebar() -> object | None:
     """Render sidebar controls; return uploaded file object or None."""
     with st.sidebar:
@@ -114,9 +104,7 @@ def render_sidebar() -> object | None:
     return uploaded
 
 
-# ──────────────────────────────────────────────
 # Core analysis pipeline
-# ──────────────────────────────────────────────
 def run_analysis(doc_text: str, doc_name: str) -> dict:
     """
     Execute the full multi-agent LangGraph workflow.
@@ -153,10 +141,7 @@ def run_analysis(doc_text: str, doc_name: str) -> dict:
 
     return result
 
-
-# ──────────────────────────────────────────────
-# Result display helpers
-# ──────────────────────────────────────────────
+# UI components for each analysis section
 def _confidence_badge(score: float) -> str:
     colour = "#21c354" if score >= 0.75 else ("#ffa600" if score >= 0.5 else "#ff4b4b")
     return (f'<span style="background:{colour};color:#fff;padding:2px 8px;'
@@ -315,14 +300,12 @@ def display_qa_chat(doc_text: str):
         st.session_state["qa_history"].append({"role": "assistant", "content": answer})
 
 
-# ──────────────────────────────────────────────
-# Main
-# ──────────────────────────────────────────────
+# Main app
 def main():
     _init_session()
     uploaded = render_sidebar()
 
-    # ── Hero header ──
+    #Hero header
     st.markdown('<p class="main-title">📄 AI Document Analyzer</p>', unsafe_allow_html=True)
     st.markdown(
         '<p class="sub-title">Upload any document — get an instant AI-powered analysis: '
@@ -331,9 +314,9 @@ def main():
     )
     st.divider()
 
-    # ── No file yet ──
+    #No file yet
     if not uploaded:
-        st.info("👈 Upload a PDF, TXT, or DOCX document from the sidebar to get started.")
+        st.info("Upload a PDF, TXT, or DOCX document from the sidebar to get started.")
 
         with st.expander("ℹ️ How it works"):
             col1, col2, col3 = st.columns(3)
@@ -355,7 +338,7 @@ def main():
     # ── Load document text ──
     if st.session_state.get("doc_hash_loaded") != doc_hash:
         loader = DocumentLoader()
-        with st.spinner("📖 Reading document…"):
+        with st.spinner("Reading document…"):
             doc_text = loader.load(uploaded)
         st.session_state["doc_text"]       = doc_text
         st.session_state["doc_name"]       = uploaded.name
